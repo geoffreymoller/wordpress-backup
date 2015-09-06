@@ -24,7 +24,7 @@ class Archive:
     except Exception,e:
       pass
 
-    soup = BeautifulSoup(doc, "lxml")
+    soup = BeautifulSoup(doc)
     attachments = soup.findAll('wp:attachment_url')
     for attachment in attachments:
       filename = attachment.text.split('/')[-1]
