@@ -1,12 +1,13 @@
 import urllib
 import os
-import sys
 import shutil
 import tarfile
 import datetime
+
 from bs4 import BeautifulSoup
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
+
 
 class Archive:
 
@@ -23,7 +24,7 @@ class Archive:
     except Exception,e:
       pass
 
-    soup = BeautifulSoup(doc)
+    soup = BeautifulSoup(doc, "lxml")
     attachments = soup.findAll('wp:attachment_url')
     for attachment in attachments:
       filename = attachment.text.split('/')[-1]
@@ -47,7 +48,9 @@ class Archive:
       pass
     return self
 
-  def backup(self):
+  def backup(self, export_doc):
+    self.process(export_doc)
+    self.save()
     try:
       conn = S3Connection(os.getenv('AMAZON_KEY'), os.getenv('AMAZON_SECRET'))
       bucket = conn.get_bucket("geoffreymoller")
@@ -57,9 +60,11 @@ class Archive:
     except Exception:
         pass
     return self
+    self.cleanup();
 
   def cleanup(self):
     shutil.rmtree(self.backup_location)
+    os.remove(self.archive_file_path)
     return self
 
 

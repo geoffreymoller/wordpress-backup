@@ -1,6 +1,9 @@
 import os
-import mechanize
+
 import cookielib
+
+import mechanize
+
 
 class Retrieve:
 
@@ -19,9 +22,9 @@ class Retrieve:
     self.br.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
 
     #DEBUG
-    self.br.set_debug_http(True)
-    self.br.set_debug_redirects(True)
-    self.br.set_debug_responses(True)
+    # self.br.set_debug_http(True)
+    # self.br.set_debug_redirects(True)
+    # self.br.set_debug_responses(True)
 
     self.br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
 
@@ -31,16 +34,11 @@ class Retrieve:
     self.br.select_form(nr=0)
     self.br["log"] = os.environ['WORDPRESS_USER']
     self.br["pwd"] = os.environ['WORDPRESS_PW']
-    login_results = self.br.submit().read()
-    #f = file('login.html', 'w')
-    #f.write(login_results)
-    #f.close()
+    self.br.submit().read()
     return self
 
   def get_export(self):
+    self.login()
     backup_url = os.environ['WORDPRESS_BACKUP_URL']
     response = self.br.open(backup_url)
     return response.read()
-    #print response.geturl()
-    #print response.info()
-    #print response.read()
