@@ -3,6 +3,8 @@ import os
 import shutil
 import tarfile
 import datetime
+import time
+from notifier import Notifier
 
 from bs4 import BeautifulSoup
 from boto.s3.connection import S3Connection
@@ -37,15 +39,15 @@ class Archive:
     return self
 
   def save(self):
-    self.archive_file_name = "wordpress_backup_" + datetime.datetime.now().strftime("%y%m%d") + ".tar"
+    self.archive_file_name = "wordpress_backup_" + datetime.datetime.now().strftime("%y%m%d") + "-" + str(time.time()) + ".tar"
     self.archive_file_path = self.backup_root + "/" + self.archive_file_name
     try:
       tar = tarfile.TarFile(self.archive_file_path, "w")
       for file_path in self.files:
         tar.add(file_path)
       tar.close()
-    except Exception:
-      pass
+    except Exception, e:
+      Notifier().send_error(e.message)
     return self
 
   def backup(self, export_doc):
@@ -57,10 +59,11 @@ class Archive:
       k = Key(bucket)
       k.key = self.archive_file_name
       k.set_contents_from_filename(self.archive_file_path)
-    except Exception:
-        pass
+    except Exception, e:
+      Notifier().send_error(e.message)
+    finally:
+      self.cleanup();
     return self
-    self.cleanup();
 
   def cleanup(self):
     shutil.rmtree(self.backup_location)
