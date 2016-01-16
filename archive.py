@@ -28,7 +28,7 @@ class Archive:
 
     soup = BeautifulSoup(doc)
     attachments = soup.findAll('wp:attachment_url')
-    for attachment in attachments:
+    for attachment in attachments[0:10]:
       filename = attachment.text.split('/')[-1]
       filepath =  self.backup_location + "/" + filename
       try:
